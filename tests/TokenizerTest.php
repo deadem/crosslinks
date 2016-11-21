@@ -24,6 +24,7 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
 
         $this->assertEquals($tokens, $tokenizer);
     }
+
     public function testTokinizerPunct()
     {
         $tokenizer = Tokenizer::parse('! !<a>!!</a>');
