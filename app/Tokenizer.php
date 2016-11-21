@@ -35,6 +35,11 @@ class Tokenizer
         return preg_match('/[[:space:]]/', $char) || $char == '';
     }
 
+    private function isAmp()
+    {
+        return $this->text[$this->current] == '&';
+    }
+
     private function isPunct()
     {
         return preg_match('/[[:punct:]]/', $this->text[$this->current]);
@@ -45,17 +50,9 @@ class Tokenizer
         return $this->text[$this->current] == $char;
     }
 
-    private function lookAhead($string)
+    private function getTokenText($offset = 0)
     {
-        $chars = str_split($string);
-
-        for ($i = 0, $len = count($chars); $i < $len; ++$i) {
-            if ($this->text[$this->current + $i] !== $chars[$i]) {
-                return false;
-            }
-        }
-
-        return true;
+        return implode('', array_slice($this->text, $this->lastIndex, $this->current - $this->lastIndex + $offset));
     }
 
     private function addToken($offset = 0)
@@ -66,7 +63,7 @@ class Tokenizer
 
         $token = [
             'type' => $this->getState(),
-            'text'  => implode('', array_slice($this->text, $this->lastIndex, $this->current - $this->lastIndex + $offset)),
+            'text'  => $this->getTokenText($offset),
         ];
 
         $this->lastIndex = $this->current + $offset;
@@ -102,9 +99,30 @@ class Tokenizer
         } elseif ($this->isSpace()) {
             $this->addToken();
             $this->setState('TextSpace');
+        } elseif ($this->isAmp()) {
+            $this->addToken();
+            $this->setState('TextAmp');
         } elseif ($this->isPunct()) {
             $this->addToken();
             $this->setState('TextPunct');
+        }
+
+        ++$this->current;
+    }
+
+    private function parseTextAmp()
+    {
+        if ($this->current(';') || $this->current('<')) {
+            $token = $this->getTokenText();
+            if ($token == '&nbsp') {
+                $this->setState('TextSpace');
+            } else {
+                $this->setState('TextPunct');
+            }
+        }
+        if ($this->current('<')) {
+            $this->addToken();
+            $this->setState('Html');
         }
 
         ++$this->current;
@@ -118,6 +136,9 @@ class Tokenizer
         } elseif ($this->isSpace()) {
             $this->addToken();
             $this->setState('TextSpace');
+        } elseif ($this->isAmp()) {
+            $this->addToken();
+            $this->setState('TextAmp');
         } elseif (! $this->isPunct()) {
             $this->addToken();
             $this->setState('Text');
@@ -130,6 +151,9 @@ class Tokenizer
         if ($this->current('<')) {
             $this->addToken();
             $this->setState('Html');
+        } elseif ($this->isAmp()) {
+            $this->addToken();
+            $this->setState('TextAmp');
         } elseif ($this->isPunct()) {
             $this->addToken();
             $this->setState('TextPunct');
