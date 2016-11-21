@@ -2,7 +2,7 @@
 
 namespace Test;
 
-use DJEM\Crosslinks;
+use DJEM\Crosslinks\Crosslinks;
 
 class EmptyTest extends \PHPUNIT_Framework_Testcase
 {
@@ -15,6 +15,12 @@ class EmptyTest extends \PHPUNIT_Framework_Testcase
         $this->assertTrue(true);
 
         $crosslinks = Crosslinks::parse('a b c d', '');
+        $this->assertTrue(true);
+    }
+
+    public function testTokenizerEmpty()
+    {
+        $tokenizer = new \DJEM\Crosslinks\Tokenizer();
         $this->assertTrue(true);
     }
 }

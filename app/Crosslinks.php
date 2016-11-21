@@ -1,6 +1,6 @@
 <?php
 
-namespace DJEM;
+namespace DJEM\Crosslinks;
 
 class Crosslinks
 {
