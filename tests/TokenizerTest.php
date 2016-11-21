@@ -97,4 +97,34 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
 
         $this->assertEquals($tokens, $tokenizer);
     }
+
+    public function testTokinizerScript()
+    {
+        $tokenizer = Tokenizer::parse('text<script><a href="link" single=\'quote\'>link---?text</a></script>more text');
+
+        $tokens = [
+            ['type' => 'Text', 'text' => 'text'],
+            ['type' => 'Script', 'text' => '<script><a href="link" single=\'quote\'>link---?text</a></script>'],
+            ['type' => 'Text', 'text' => 'more'],
+            ['type' => 'TextSpace', 'text' => ' '],
+            ['type' => 'Text', 'text' => 'text'],
+        ];
+
+        $this->assertEquals($tokens, $tokenizer);
+    }
+
+    public function testTokinizerStyle()
+    {
+        $tokenizer = Tokenizer::parse('text<style><a href="link" single=\'quote\'>link---?text</a></style>more text');
+
+        $tokens = [
+            ['type' => 'Text', 'text' => 'text'],
+            ['type' => 'Style', 'text' => '<style><a href="link" single=\'quote\'>link---?text</a></style>'],
+            ['type' => 'Text', 'text' => 'more'],
+            ['type' => 'TextSpace', 'text' => ' '],
+            ['type' => 'Text', 'text' => 'text'],
+        ];
+
+        $this->assertEquals($tokens, $tokenizer);
+    }
 }

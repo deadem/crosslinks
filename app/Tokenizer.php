@@ -241,6 +241,28 @@ class Tokenizer
         ++$this->current;
     }
 
+    private function parseScript()
+    {
+        if ($this->current('<') && $this->isAhead('</script>')) {
+            $this->addToken('</script>');
+            $this->popState();
+
+            return;
+        }
+        ++$this->current;
+    }
+
+    private function parseStyle()
+    {
+        if ($this->current('<') && $this->isAhead('</style>')) {
+            $this->addToken('</style>');
+            $this->popState();
+
+            return;
+        }
+        ++$this->current;
+    }
+
     public static function parse($text)
     {
         $tokenizer = new self();
