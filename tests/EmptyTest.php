@@ -20,7 +20,7 @@ class EmptyTest extends \PHPUNIT_Framework_Testcase
 
     public function testTokenizerEmpty()
     {
-        $tokenizer = new \DJEM\Crosslinks\Tokenizer();
+        $tokenizer = \DJEM\Crosslinks\Tokenizer::parse('');
         $this->assertTrue(true);
     }
 }
