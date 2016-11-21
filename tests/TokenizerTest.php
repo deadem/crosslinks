@@ -73,11 +73,13 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
         ];
         $this->assertEquals($tokens, $tokenizer);
 
-        $tokenizer = Tokenizer::parse('&amp;!!&amp; text');
+        $tokenizer = Tokenizer::parse('&amp;!!&amp<hr>; text');
         $tokens = [
             ['type' => 'TextAmp', 'text' => '&amp;'],
             ['type' => 'TextPunct', 'text' => '!!'],
-            ['type' => 'TextAmp', 'text' => '&amp;'],
+            ['type' => 'TextAmp', 'text' => '&amp'],
+            ['type' => 'Html', 'text' => '<hr>'],
+            ['type' => 'TextPunct', 'text' => ';'],
             ['type' => 'TextSpace', 'text' => ' '],
             ['type' => 'Text', 'text' => 'text'],
         ];
