@@ -112,15 +112,13 @@ class Tokenizer
 
     private function parseTextAmp()
     {
-        $isSpace = $this->isSpace();
-
-        if ($this->current(';') || $this->current('<') || $isSpace) {
+        if ($this->current(';') || $this->current('<') || $this->isSpace()) {
             $token = $this->getTokenText();
             if ($token == '&nbsp') {
                 $this->setState('TextSpace');
             } else {
                 $this->setState('TextPunct');
-                if ($isSpace) {
+                if ($this->isSpace()) {
                     $this->addToken();
                     $this->setState('TextSpace');
                 }
