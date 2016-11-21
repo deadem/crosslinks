@@ -4,7 +4,7 @@ namespace DJEM\Crosslinks;
 
 class Tokenizer
 {
-    private $state = 'Text';
+    private $state = ['Text'];
 
     private $current = 0;
     private $length = 0;
@@ -20,12 +20,17 @@ class Tokenizer
 
     private function setState($state)
     {
-        $this->state = $state;
+        $this->state[] = $state;
+    }
+
+    private function popState()
+    {
+        return array_pop($this->state);
     }
 
     private function getState()
     {
-        return $this->state;
+        return end($this->state);
     }
 
     private function isSpace()
@@ -50,6 +55,14 @@ class Tokenizer
         return $this->text[$this->current] == $char;
     }
 
+    private function isAhead($string)
+    {
+        $length = strlen($string);
+        $text = implode('', array_slice($this->text, $this->current, $length));
+
+        return strcasecmp($string, $text) == 0;
+    }
+
     private function getTokenText($offset = 0)
     {
         return implode('', array_slice($this->text, $this->lastIndex, $this->current - $this->lastIndex + $offset));
@@ -57,7 +70,11 @@ class Tokenizer
 
     private function addToken($offset = 0)
     {
-        if ($this->lastIndex == $this->current + $offset) {
+        if (is_string($offset)) {
+            $offset = strlen($offset);
+        }
+
+        if ($this->lastIndex >= $this->current + $offset || $this->current + $offset > $this->length) {
             return;
         }
 
@@ -66,7 +83,7 @@ class Tokenizer
             'text'  => $this->getTokenText($offset),
         ];
 
-        $this->lastIndex = $this->current + $offset;
+        $this->lastIndex = $this->current = $this->current + $offset;
         $this->tokens[] = $token;
     }
 
@@ -86,16 +103,27 @@ class Tokenizer
         }
         $this->addToken();
 
-        // var_dump($this->tokens);
-
         return $this->tokens;
+    }
+
+    private function openTag()
+    {
+        if ($this->isAhead('<!--')) {
+            $this->setState('Comment');
+        } elseif ($this->isAhead('<script')) {
+            $this->setState('Script');
+        } elseif ($this->isAhead('<style')) {
+            $this->setState('Style');
+        } else {
+            $this->setState('Html');
+        }
     }
 
     private function parseText()
     {
         if ($this->current('<')) {
             $this->addToken();
-            $this->setState('Html');
+            $this->openTag();
         } elseif ($this->isSpace()) {
             $this->addToken();
             $this->setState('TextSpace');
@@ -112,21 +140,15 @@ class Tokenizer
 
     private function parseTextAmp()
     {
-        if ($this->current(';') || $this->current('<') || $this->isSpace()) {
-            $token = $this->getTokenText();
-            if ($token == '&nbsp') {
-                $this->setState('TextSpace');
-            } else {
-                $this->setState('TextPunct');
-                if ($this->isSpace()) {
-                    $this->addToken();
-                    $this->setState('TextSpace');
-                }
-            }
-        }
-        if ($this->current('<')) {
+        if ($this->current(';')) {
+            $this->addToken(';');
+            $this->popState();
+
+            return;
+        } elseif ($this->current('<')) {
             $this->addToken();
-            $this->setState('Html');
+            $this->popState();
+            $this->openTag();
         }
 
         ++$this->current;
@@ -136,16 +158,19 @@ class Tokenizer
     {
         if ($this->current('<')) {
             $this->addToken();
-            $this->setState('Html');
+            $this->popState();
+            $this->openTag();
         } elseif ($this->isSpace()) {
             $this->addToken();
+            $this->popState();
             $this->setState('TextSpace');
         } elseif ($this->isAmp()) {
             $this->addToken();
+            $this->popState();
             $this->setState('TextAmp');
         } elseif (! $this->isPunct()) {
             $this->addToken();
-            $this->setState('Text');
+            $this->popState();
         }
         ++$this->current;
     }
@@ -154,16 +179,19 @@ class Tokenizer
     {
         if ($this->current('<')) {
             $this->addToken();
-            $this->setState('Html');
+            $this->popState();
+            $this->openTag();
         } elseif ($this->isAmp()) {
             $this->addToken();
+            $this->popState();
             $this->setState('TextAmp');
         } elseif ($this->isPunct()) {
             $this->addToken();
+            $this->popState();
             $this->setState('TextPunct');
         } elseif (! $this->isSpace()) {
             $this->addToken();
-            $this->setState('Text');
+            $this->popState();
         }
         ++$this->current;
     }
@@ -175,8 +203,10 @@ class Tokenizer
         } elseif ($this->current('\'')) {
             $this->setState('HtmlSingleQuote');
         } elseif ($this->current('>')) {
-            $this->addToken(1);
-            $this->setState('Text');
+            $this->addToken('>');
+            $this->popState();
+
+            return;
         }
 
         ++$this->current;
@@ -185,7 +215,7 @@ class Tokenizer
     private function parseHtmlQuote()
     {
         if ($this->current('"')) {
-            $this->setState('Html');
+            $this->popState();
         }
 
         ++$this->current;
@@ -194,9 +224,20 @@ class Tokenizer
     private function parseHtmlSingleQuote()
     {
         if ($this->current('\'')) {
-            $this->setState('Html');
+            $this->popState();
         }
 
+        ++$this->current;
+    }
+
+    private function parseComment()
+    {
+        if ($this->current('-') && $this->isAhead('-->')) {
+            $this->addToken('-->');
+            $this->popState();
+
+            return;
+        }
         ++$this->current;
     }
 

@@ -24,7 +24,6 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
 
         $this->assertEquals($tokens, $tokenizer);
     }
-
     public function testTokinizerPunct()
     {
         $tokenizer = Tokenizer::parse('! !<a>!!</a>');
@@ -54,29 +53,48 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
 
     public function testTokinizerAmp()
     {
-        $tokenizer = Tokenizer::parse(" <a> \r\n&nbsp;!&nbsp;&amp;</a>&nbsp<hr>&amp<hr>");
+        $tokenizer = Tokenizer::parse("&nbsp;&nbsp; <a> \r\n&nbsp;!&nbsp;&amp;</a>&nbsp;<hr>&amp;<hr>");
         $tokens = [
+            ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            ['type' => 'TextAmp', 'text' => '&nbsp;'],
             ['type' => 'TextSpace', 'text' => ' '],
             ['type' => 'Html', 'text' => '<a>'],
             ['type' => 'TextSpace', 'text' => " \r\n"],
-            ['type' => 'TextSpace', 'text' => '&nbsp;'],
+            ['type' => 'TextAmp', 'text' => '&nbsp;'],
             ['type' => 'TextPunct', 'text' => '!'],
-            ['type' => 'TextSpace', 'text' => '&nbsp;'],
-            ['type' => 'TextPunct', 'text' => '&amp;'],
+            ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            ['type' => 'TextAmp', 'text' => '&amp;'],
             ['type' => 'Html', 'text' => '</a>'],
-            ['type' => 'TextSpace', 'text' => '&nbsp'],
+            ['type' => 'TextAmp', 'text' => '&nbsp;'],
             ['type' => 'Html', 'text' => '<hr>'],
-            ['type' => 'TextPunct', 'text' => '&amp'],
+            ['type' => 'TextAmp', 'text' => '&amp;'],
             ['type' => 'Html', 'text' => '<hr>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
 
-        $tokenizer = Tokenizer::parse('&amp!!&amp text');
+        $tokenizer = Tokenizer::parse('&amp;!!&amp; text');
         $tokens = [
-            ['type' => 'TextPunct', 'text' => '&amp!!&amp'],
+            ['type' => 'TextAmp', 'text' => '&amp;'],
+            ['type' => 'TextPunct', 'text' => '!!'],
+            ['type' => 'TextAmp', 'text' => '&amp;'],
             ['type' => 'TextSpace', 'text' => ' '],
             ['type' => 'Text', 'text' => 'text'],
         ];
+        $this->assertEquals($tokens, $tokenizer);
+    }
+
+    public function testTokinizerComment()
+    {
+        $tokenizer = Tokenizer::parse('text<!--a href="link" single=\'quote\'>link---?text</a-->more text');
+
+        $tokens = [
+            ['type' => 'Text', 'text' => 'text'],
+            ['type' => 'Comment', 'text' => '<!--a href="link" single=\'quote\'>link---?text</a-->'],
+            ['type' => 'Text', 'text' => 'more'],
+            ['type' => 'TextSpace', 'text' => ' '],
+            ['type' => 'Text', 'text' => 'text'],
+        ];
+
         $this->assertEquals($tokens, $tokenizer);
     }
 }
