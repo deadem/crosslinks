@@ -1,0 +1,22 @@
+{
+    "name": "deadem/crosslinks",
+    "description": "Crosslinks",
+    "license": "MIT",
+
+    "require": {
+        "php": ">=5.6"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "DJEM\\Crosslinks": "app/"
+        }
+    },
+
+    "authors": [
+        {
+            "name": "Vladimir Soshkin",
+            "email": "deadem@gmail.com"
+        }
+    ]
+}
