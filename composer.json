@@ -9,7 +9,7 @@
 
     "autoload": {
         "psr-4": {
-            "DJEM\\Crosslinks": "app/"
+            "DJEM\\Crosslinks\\": "app/"
         }
     },
 
