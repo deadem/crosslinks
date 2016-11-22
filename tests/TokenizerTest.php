@@ -11,15 +11,15 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
         $tokenizer = Tokenizer::parse('text<a href="link" single=\'quote\'>link---?text</a>more text');
 
         $tokens = [
-            ['type' => 'Text', 'text' => 'text'],
-            ['type' => 'Html', 'text' => '<a href="link" single=\'quote\'>'],
-            ['type' => 'Text', 'text' => 'link'],
-            ['type' => 'TextPunct', 'text' => '---?'],
-            ['type' => 'Text', 'text' => 'text'],
-            ['type' => 'Html', 'text' => '</a>'],
-            ['type' => 'Text', 'text' => 'more'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Html', 'text' => '<a href="link" single=\'quote\'>'],
+            (object) ['type' => 'Text', 'text' => 'link'],
+            (object) ['type' => 'TextPunct', 'text' => '---?'],
+            (object) ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Html', 'text' => '</a>'],
+            (object) ['type' => 'Text', 'text' => 'more'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Text', 'text' => 'text'],
         ];
 
         $this->assertEquals($tokens, $tokenizer);
@@ -29,12 +29,12 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
     {
         $tokenizer = Tokenizer::parse('! !<a>!!</a>');
         $tokens = [
-            ['type' => 'TextPunct', 'text' => '!'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'TextPunct', 'text' => '!'],
-            ['type' => 'Html', 'text' => '<a>'],
-            ['type' => 'TextPunct', 'text' => '!!'],
-            ['type' => 'Html', 'text' => '</a>'],
+            (object) ['type' => 'TextPunct', 'text' => '!'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'TextPunct', 'text' => '!'],
+            (object) ['type' => 'Html', 'text' => '<a>'],
+            (object) ['type' => 'TextPunct', 'text' => '!!'],
+            (object) ['type' => 'Html', 'text' => '</a>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
     }
@@ -43,11 +43,11 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
     {
         $tokenizer = Tokenizer::parse(" <a> \r\n!</a>");
         $tokens = [
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Html', 'text' => '<a>'],
-            ['type' => 'TextSpace', 'text' => " \r\n"],
-            ['type' => 'TextPunct', 'text' => '!'],
-            ['type' => 'Html', 'text' => '</a>'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Html', 'text' => '<a>'],
+            (object) ['type' => 'TextSpace', 'text' => " \r\n"],
+            (object) ['type' => 'TextPunct', 'text' => '!'],
+            (object) ['type' => 'Html', 'text' => '</a>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
     }
@@ -56,32 +56,32 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
     {
         $tokenizer = Tokenizer::parse("&nbsp;&nbsp; <a> \r\n&nbsp;!&nbsp;&amp;</a>&nbsp;<hr>&amp;<hr>");
         $tokens = [
-            ['type' => 'TextAmp', 'text' => '&nbsp;'],
-            ['type' => 'TextAmp', 'text' => '&nbsp;'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Html', 'text' => '<a>'],
-            ['type' => 'TextSpace', 'text' => " \r\n"],
-            ['type' => 'TextAmp', 'text' => '&nbsp;'],
-            ['type' => 'TextPunct', 'text' => '!'],
-            ['type' => 'TextAmp', 'text' => '&nbsp;'],
-            ['type' => 'TextAmp', 'text' => '&amp;'],
-            ['type' => 'Html', 'text' => '</a>'],
-            ['type' => 'TextAmp', 'text' => '&nbsp;'],
-            ['type' => 'Html', 'text' => '<hr>'],
-            ['type' => 'TextAmp', 'text' => '&amp;'],
-            ['type' => 'Html', 'text' => '<hr>'],
+            (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Html', 'text' => '<a>'],
+            (object) ['type' => 'TextSpace', 'text' => " \r\n"],
+            (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            (object) ['type' => 'TextPunct', 'text' => '!'],
+            (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            (object) ['type' => 'TextAmp', 'text' => '&amp;'],
+            (object) ['type' => 'Html', 'text' => '</a>'],
+            (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
+            (object) ['type' => 'Html', 'text' => '<hr>'],
+            (object) ['type' => 'TextAmp', 'text' => '&amp;'],
+            (object) ['type' => 'Html', 'text' => '<hr>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
 
         $tokenizer = Tokenizer::parse('&amp;!!&amp<hr>; text');
         $tokens = [
-            ['type' => 'TextAmp', 'text' => '&amp;'],
-            ['type' => 'TextPunct', 'text' => '!!'],
-            ['type' => 'TextAmp', 'text' => '&amp'],
-            ['type' => 'Html', 'text' => '<hr>'],
-            ['type' => 'TextPunct', 'text' => ';'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'TextAmp', 'text' => '&amp;'],
+            (object) ['type' => 'TextPunct', 'text' => '!!'],
+            (object) ['type' => 'TextAmp', 'text' => '&amp'],
+            (object) ['type' => 'Html', 'text' => '<hr>'],
+            (object) ['type' => 'TextPunct', 'text' => ';'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Text', 'text' => 'text'],
         ];
         $this->assertEquals($tokens, $tokenizer);
     }
@@ -91,11 +91,11 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
         $tokenizer = Tokenizer::parse('text<!--a href="link" single=\'quote\'>link---?text</a-->more text');
 
         $tokens = [
-            ['type' => 'Text', 'text' => 'text'],
-            ['type' => 'Comment', 'text' => '<!--a href="link" single=\'quote\'>link---?text</a-->'],
-            ['type' => 'Text', 'text' => 'more'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Comment', 'text' => '<!--a href="link" single=\'quote\'>link---?text</a-->'],
+            (object) ['type' => 'Text', 'text' => 'more'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Text', 'text' => 'text'],
         ];
 
         $this->assertEquals($tokens, $tokenizer);
@@ -106,11 +106,11 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
         $tokenizer = Tokenizer::parse('text<script><a href="link" single=\'quote\'>link---?text</a></script>more text');
 
         $tokens = [
-            ['type' => 'Text', 'text' => 'text'],
-            ['type' => 'Script', 'text' => '<script><a href="link" single=\'quote\'>link---?text</a></script>'],
-            ['type' => 'Text', 'text' => 'more'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Script', 'text' => '<script><a href="link" single=\'quote\'>link---?text</a></script>'],
+            (object) ['type' => 'Text', 'text' => 'more'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Text', 'text' => 'text'],
         ];
 
         $this->assertEquals($tokens, $tokenizer);
@@ -121,11 +121,11 @@ class TokenizerTest extends \PHPUNIT_Framework_Testcase
         $tokenizer = Tokenizer::parse('text<style><a href="link" single=\'quote\'>link---?text</a></style>more text');
 
         $tokens = [
-            ['type' => 'Text', 'text' => 'text'],
-            ['type' => 'Style', 'text' => '<style><a href="link" single=\'quote\'>link---?text</a></style>'],
-            ['type' => 'Text', 'text' => 'more'],
-            ['type' => 'TextSpace', 'text' => ' '],
-            ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Text', 'text' => 'text'],
+            (object) ['type' => 'Style', 'text' => '<style><a href="link" single=\'quote\'>link---?text</a></style>'],
+            (object) ['type' => 'Text', 'text' => 'more'],
+            (object) ['type' => 'TextSpace', 'text' => ' '],
+            (object) ['type' => 'Text', 'text' => 'text'],
         ];
 
         $this->assertEquals($tokens, $tokenizer);

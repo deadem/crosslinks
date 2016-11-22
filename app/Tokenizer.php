@@ -78,7 +78,7 @@ class Tokenizer
             return;
         }
 
-        $token = [
+        $token = (object) [
             'type' => $this->getState(),
             'text'  => $this->getTokenText($offset),
         ];
