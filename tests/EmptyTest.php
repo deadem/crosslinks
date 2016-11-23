@@ -4,7 +4,7 @@ namespace Test;
 
 use DJEM\Crosslinks\Crosslinks;
 
-class EmptyTest extends \PHPUNIT_Framework_Testcase
+class EmptyTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmpty()
     {

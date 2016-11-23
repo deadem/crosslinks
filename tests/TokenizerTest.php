@@ -4,7 +4,7 @@ namespace Test;
 
 use DJEM\Crosslinks\Tokenizer;
 
-class TokenizerTest extends \PHPUNIT_Framework_Testcase
+class TokenizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testTokinizer()
     {
