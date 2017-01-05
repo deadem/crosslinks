@@ -50,6 +50,22 @@ class Crosslinks
         }
     }
 
+    private function getStartToken($link)
+    {
+        return (object) [
+            'type' => 'CrosslinkStart',
+            'text' => '<a href="'.htmlentities($link).'">',
+        ];
+    }
+
+    private function getEndToken()
+    {
+        return (object) [
+            'type' => 'CrosslinkEnd',
+            'text' => '</a>',
+        ];
+    }
+
     private function checkFullPhrase($word)
     {
         foreach ($this->candidates as &$entry) {
@@ -60,22 +76,63 @@ class Crosslinks
 
             // full phrase match
             if (count($entry['phrase']) == 0) {
-                array_splice($this->buffer, $entry['position'], 0, [
-                    (object) [
-                        'type' => 'CrosslinkStart',
-                        'text' => '<a href="'.htmlentities($entry['link']).'">',
-                    ],
-                ]);
-                $this->buffer[] = (object) [
-                    'type' => 'CrosslinkEnd',
-                    'text' => '</a>',
-                ];
+                array_splice($this->buffer, $entry['position'], 0, [$this->getStartToken($entry['link'])]);
+                $this->buffer[] = $this->getEndToken();
 
                 // only one candidate can match
                 $this->candidates = [];
                 break;
             }
         }
+    }
+
+    private function isTextToken($token)
+    {
+        switch ($token->type) {
+            case 'Text':
+            case 'TextPunct':
+            case 'TextSpace':
+            case 'TextAmp':
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private function normalizeBuffer()
+    {
+        $temp = [];
+        $lastLinkState = false;
+        $isTokenOpen = false;
+
+        foreach ($this->buffer as $token) {
+            if ($lastLinkState) {
+                if (! $isTokenOpen && $token->type == 'Text') {
+                    $temp[] = $lastLinkState;
+                    $isTokenOpen = true;
+                } elseif ($isTokenOpen && ! $this->isTextToken($token)) {
+                    $temp[] = $this->getEndToken();
+                    $isTokenOpen = false;
+                }
+            }
+            if ($token->type == 'CrosslinkStart') {
+                $lastLinkState = $token;
+                $isTokenOpen = true;
+            }
+            if ($token->type == 'CrosslinkEnd') {
+                $lastLinkState = false;
+
+                // already closed
+                if ($isTokenOpen == false) {
+                    continue;
+                }
+                $isTokenOpen = false;
+            }
+            $temp[] = $token;
+        }
+
+        $this->buffer = $temp;
     }
 
     private function run()
@@ -93,6 +150,8 @@ class Crosslinks
                 $this->buffer[] = $token;
             }
         }
+
+        $this->normalizeBuffer();
 
         return Tokenizer::toString($this->buffer);
     }
