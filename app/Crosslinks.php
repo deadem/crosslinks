@@ -53,21 +53,16 @@ class Crosslinks
         return $word;
     }
 
-    private function findWord($word, $arr)
-    {
-        return array_search($this->normalizeWord($word), $arr) !== false;
-    }
-
     private function fillCandidates($word)
     {
         // remove invalid candidates
         $this->candidates = array_filter($this->candidates, function ($entry) use ($word) {
-            return $this->findWord($word, $entry['phrase']);
+            return array_search($word, $entry['phrase']) !== false;
         });
 
         // insert new candidates
         foreach ($this->phrases as $entry) {
-            if ($this->findWord($word, $entry['phrase'])) {
+            if (array_search($word, $entry['phrase']) !== false) {
                 $entry['position'] = count($this->buffer);
                 $this->candidates[] = $entry;
             }
@@ -95,7 +90,7 @@ class Crosslinks
         foreach ($this->candidates as &$entry) {
             // remove matched word
             $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word) {
-                return $this->normalizeWord($word) != $phrase;
+                return $word != $phrase;
             });
 
             // full phrase match
@@ -166,10 +161,12 @@ class Crosslinks
 
         foreach ($this->tokens as $token) {
             if ($token->type == 'Text') {
-                $this->fillCandidates($token->text);
+                $word = $this->normalizeWord($token->text);
+
+                $this->fillCandidates($word);
                 $this->buffer[] = $token;
 
-                $this->checkFullPhrase($token->text);
+                $this->checkFullPhrase($word);
             } else {
                 $this->buffer[] = $token;
             }
