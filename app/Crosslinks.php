@@ -55,11 +55,7 @@ class Crosslinks
 
     private function findWord($word, $arr)
     {
-        $word = $this->normalizeWord($word);
-
-        return count(array_filter($arr, function ($entry) use ($word) {
-            return $entry == $word;
-        })) != 0;
+        return array_search($this->normalizeWord($word), $arr) !== false;
     }
 
     private function fillCandidates($word)
