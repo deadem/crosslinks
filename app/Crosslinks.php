@@ -38,7 +38,7 @@ class Crosslinks
     {
         // remove invalid candidates
         $this->candidates = array_filter($this->candidates, function ($entry) use ($word) {
-            return (bool) array_search($word, $entry['phrase']);
+            return array_search($word, $entry['phrase']) !== false;
         });
 
         // insert new candidates
@@ -50,16 +50,17 @@ class Crosslinks
         }
     }
 
-    private function checkPhrase($word)
+    private function checkFullPhrase($word)
     {
-        foreach ($this->candidates as $entry) {
+        foreach ($this->candidates as &$entry) {
             // remove matched word
-            $phrase = array_filter($entry['phrase'], function ($phrase) use ($word) {
+            $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word) {
                 return $word != $phrase;
             });
+            // var_dump($entry);
 
             // full phrase match
-            if (count($phrase) == 0) {
+            if (count($entry['phrase']) == 0) {
                 array_splice($this->buffer, $entry['position'], 0, [
                     (object) [
                         'type' => 'CrosslinkStart',
@@ -88,7 +89,7 @@ class Crosslinks
                 $this->fillCandidates($token->text);
                 $this->buffer[] = $token;
 
-                $this->checkPhrase($token->text);
+                $this->checkFullPhrase($token->text);
             } else {
                 $this->buffer[] = $token;
             }
