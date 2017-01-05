@@ -22,5 +22,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $crosslinks = Crosslinks::parse('a b c d', ['c b' => '/a-link']);
         $this->assertEquals('a <a href="/a-link">b c</a> d', $crosslinks);
+
+        $crosslinks = Crosslinks::parse('a b c d e', ['c d b' => '/a-link']);
+        $this->assertEquals('a <a href="/a-link">b c d</a> e', $crosslinks);
+
+        $crosslinks = Crosslinks::parse('a b c d', ['c d b' => '/a-link']);
+        $this->assertEquals('a <a href="/a-link">b c d</a>', $crosslinks);
     }
 }

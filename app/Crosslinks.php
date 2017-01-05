@@ -57,7 +57,6 @@ class Crosslinks
             $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word) {
                 return $word != $phrase;
             });
-            // var_dump($entry);
 
             // full phrase match
             if (count($entry['phrase']) == 0) {
