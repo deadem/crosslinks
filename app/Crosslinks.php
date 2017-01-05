@@ -6,12 +6,18 @@ class Crosslinks
 {
     private $tokens = [];
     private $phrases = [];
+    private $stemmers = [];
 
     private $candidates = [];
     private $buffer = [];
 
     private function __construct()
     {
+    }
+
+    private function addStemmers($stemmers)
+    {
+        $this->stemmers = $stemmers;
     }
 
     private function addText($text)
@@ -28,22 +34,44 @@ class Crosslinks
 
         foreach ($phrases as $phrase => $link) {
             $this->phrases[] = [
-                'phrase' => preg_split('/\s+/', $phrase),
+                'phrase' => array_map(function ($word) {
+                    return $this->normalizeWord($word);
+                }, preg_split('/\s+/', $phrase)),
                 'link' => $link,
             ];
         }
+    }
+
+    private function normalizeWord($word)
+    {
+        foreach ($this->stemmers as $func) {
+            if (function_exists($func)) {
+                $word = $func($word);
+            }
+        }
+
+        return $word;
+    }
+
+    private function findWord($word, $arr)
+    {
+        $word = $this->normalizeWord($word);
+
+        return count(array_filter($arr, function ($entry) use ($word) {
+            return $entry == $word;
+        })) != 0;
     }
 
     private function fillCandidates($word)
     {
         // remove invalid candidates
         $this->candidates = array_filter($this->candidates, function ($entry) use ($word) {
-            return array_search($word, $entry['phrase']) !== false;
+            return $this->findWord($word, $entry['phrase']);
         });
 
         // insert new candidates
         foreach ($this->phrases as $entry) {
-            if (array_search($word, $entry['phrase']) !== false) {
+            if ($this->findWord($word, $entry['phrase'])) {
                 $entry['position'] = count($this->buffer);
                 $this->candidates[] = $entry;
             }
@@ -71,7 +99,7 @@ class Crosslinks
         foreach ($this->candidates as &$entry) {
             // remove matched word
             $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word) {
-                return $word != $phrase;
+                return $this->normalizeWord($word) != $phrase;
             });
 
             // full phrase match
@@ -156,10 +184,11 @@ class Crosslinks
         return Tokenizer::toString($this->buffer);
     }
 
-    public static function parse($text, $phrases)
+    public static function parse($text, $phrases, $stemmers = [])
     {
         $crosslinks = new self();
 
+        $crosslinks->addStemmers($stemmers);
         $crosslinks->addText($text);
         $crosslinks->addPhrases($phrases);
 
