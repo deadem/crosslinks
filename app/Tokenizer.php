@@ -270,4 +270,14 @@ class Tokenizer
 
         return $tokenizer->tokenize();
     }
+
+    public static function toString($tokens)
+    {
+        $text = '';
+        foreach ($tokens as $token) {
+            $text .= $token->text;
+        }
+
+        return $text;
+    }
 }

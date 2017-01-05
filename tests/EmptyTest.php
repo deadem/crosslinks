@@ -8,14 +8,15 @@ class EmptyTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmpty()
     {
-        $crosslinks = Crosslinks::parse('a b c d', ['a' => '/a-link']);
-        $this->assertTrue(true);
+        $str = 'a b c d';
+        $crosslinks = Crosslinks::parse($str, []);
+        $this->assertEquals($str, $crosslinks);
 
-        $crosslinks = Crosslinks::parse('a b c d', null);
-        $this->assertTrue(true);
+        $crosslinks = Crosslinks::parse($str, null);
+        $this->assertEquals($str, $crosslinks);
 
-        $crosslinks = Crosslinks::parse('a b c d', '');
-        $this->assertTrue(true);
+        $crosslinks = Crosslinks::parse($str, '');
+        $this->assertEquals($str, $crosslinks);
     }
 
     public function testTokenizerEmpty()

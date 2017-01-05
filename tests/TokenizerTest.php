@@ -8,7 +8,8 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testTokinizer()
     {
-        $tokenizer = Tokenizer::parse('text<a href="link" single=\'quote\'>link---?text</a>more text');
+        $str = 'text<a href="link" single=\'quote\'>link---?text</a>more text';
+        $tokenizer = Tokenizer::parse($str);
 
         $tokens = [
             (object) ['type' => 'Text', 'text' => 'text'],
@@ -23,11 +24,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerPunct()
     {
-        $tokenizer = Tokenizer::parse('! !<a>!!</a>');
+        $str = '! !<a>!!</a>';
+        $tokenizer = Tokenizer::parse($str);
         $tokens = [
             (object) ['type' => 'TextPunct', 'text' => '!'],
             (object) ['type' => 'TextSpace', 'text' => ' '],
@@ -37,11 +40,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
             (object) ['type' => 'Html', 'text' => '</a>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerSpace()
     {
-        $tokenizer = Tokenizer::parse(" <a> \r\n!</a>");
+        $str = " <a> \r\n!</a>";
+        $tokenizer = Tokenizer::parse($str);
         $tokens = [
             (object) ['type' => 'TextSpace', 'text' => ' '],
             (object) ['type' => 'Html', 'text' => '<a>'],
@@ -50,11 +55,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
             (object) ['type' => 'Html', 'text' => '</a>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerAmp()
     {
-        $tokenizer = Tokenizer::parse("&nbsp;&nbsp; <a> \r\n&nbsp;!&nbsp;&amp;</a>&nbsp;<hr>&amp;<hr>");
+        $str = "&nbsp;&nbsp; <a> \r\n&nbsp;!&nbsp;&amp;</a>&nbsp;<hr>&amp;<hr>";
+        $tokenizer = Tokenizer::parse($str);
         $tokens = [
             (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
             (object) ['type' => 'TextAmp', 'text' => '&nbsp;'],
@@ -72,8 +79,10 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
             (object) ['type' => 'Html', 'text' => '<hr>'],
         ];
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
 
-        $tokenizer = Tokenizer::parse('&amp;!!&amp<hr>; text');
+        $str = '&amp;!!&amp<hr>; text';
+        $tokenizer = Tokenizer::parse($str);
         $tokens = [
             (object) ['type' => 'TextAmp', 'text' => '&amp;'],
             (object) ['type' => 'TextPunct', 'text' => '!!'],
@@ -84,11 +93,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
             (object) ['type' => 'Text', 'text' => 'text'],
         ];
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerComment()
     {
-        $tokenizer = Tokenizer::parse('text<!--a href="link" single=\'quote\'>link---?text</a-->more text');
+        $str = 'text<!--a href="link" single=\'quote\'>link---?text</a-->more text';
+        $tokenizer = Tokenizer::parse($str);
 
         $tokens = [
             (object) ['type' => 'Text', 'text' => 'text'],
@@ -99,11 +110,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerScript()
     {
-        $tokenizer = Tokenizer::parse('text<script><a href="link" single=\'quote\'>link---?text</a></script>more text');
+        $str = 'text<script><a href="link" single=\'quote\'>link---?text</a></script>more text';
+        $tokenizer = Tokenizer::parse($str);
 
         $tokens = [
             (object) ['type' => 'Text', 'text' => 'text'],
@@ -114,11 +127,13 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 
     public function testTokinizerStyle()
     {
-        $tokenizer = Tokenizer::parse('text<style><a href="link" single=\'quote\'>link---?text</a></style>more text');
+        $str = 'text<style><a href="link" single=\'quote\'>link---?text</a></style>more text';
+        $tokenizer = Tokenizer::parse($str);
 
         $tokens = [
             (object) ['type' => 'Text', 'text' => 'text'],
@@ -129,5 +144,6 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($tokens, $tokenizer);
+        $this->assertEquals($str, Tokenizer::toString($tokenizer));
     }
 }
