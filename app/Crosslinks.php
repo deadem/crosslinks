@@ -38,7 +38,7 @@ class Crosslinks
     {
         // remove invalid candidates
         $this->candidates = array_filter($this->candidates, function ($entry) use ($word) {
-            return ! ! array_search($word, $entry['phrase']);
+            return (bool) array_search($word, $entry['phrase']);
         });
 
         // insert new candidates
