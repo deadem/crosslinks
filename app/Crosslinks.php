@@ -176,7 +176,7 @@ class Crosslinks
                     if (preg_match('|<a\W|i', $token->text)) {
                         $this->candidates = [];
                         $skipLink = true;
-                    } elseif (preg_match('|</a|', $token->text)) {
+                    } elseif (preg_match('|</a\W|i', $token->text)) {
                         $skipLink = false;
                     }
                 }
