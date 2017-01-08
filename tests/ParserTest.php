@@ -56,5 +56,19 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             'Test\\stemming_test_two',
         ]);
         $this->assertEquals('a <b><a href="/a-link">testing functions</a></b> d', $crosslinks);
+
+        if (function_exists('stem_russian_unicode')) {
+            $crosslinks = Crosslinks::parse('Были в карьере Фрэнка Синатры не только взлеты, но и падения.', ['Фрэнк Синатра' => '/a-link'], [
+                'stem_russian_unicode',
+            ]);
+            $this->assertEquals('Были в карьере <a href="/a-link">Фрэнка Синатры</a> не только взлеты, но и падения.', $crosslinks);
+        }
+
+        if (function_exists('stem_english')) {
+            $crosslinks = Crosslinks::parse('a <b>testing functions</b> d', ['test function' => '/a-link'], [
+                'stem_english',
+            ]);
+            $this->assertEquals('a <b><a href="/a-link">testing functions</a></b> d', $crosslinks);
+        }
     }
 }
