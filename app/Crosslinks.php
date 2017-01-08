@@ -45,9 +45,7 @@ class Crosslinks
     private function normalizeWord($word)
     {
         foreach ($this->stemmers as $func) {
-            if (function_exists($func)) {
-                $word = $func($word);
-            }
+            $word = $func($word);
         }
 
         return $word;
