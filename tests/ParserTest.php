@@ -39,6 +39,15 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a <b><a href="/a-link">b</a></b> <i><a href="/a-link">c</a></i> d', $crosslinks);
     }
 
+    public function testHtmlSkipLinks()
+    {
+        $crosslinks = Crosslinks::parse('a <b>b</b> <i>c</i> d', ['b' => '/a-link', 'c' => '/a-link']);
+        $this->assertEquals('a <b><a href="/a-link">b</a></b> <i><a href="/a-link">c</a></i> d', $crosslinks);
+
+        $crosslinks = Crosslinks::parse('a <a>b</a> <i>c</i> d', ['b' => '/a-link', 'c' => '/a-link']);
+        $this->assertEquals('a <a>b</a> <i><a href="/a-link">c</a></i> d', $crosslinks);
+    }
+
     public function testStemming()
     {
         function stemming_test_one($word)

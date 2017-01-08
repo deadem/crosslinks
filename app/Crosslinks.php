@@ -156,9 +156,14 @@ class Crosslinks
     {
         $this->buffer = [];
         $this->candidates = [];
+        $skipLink = false;
 
         foreach ($this->tokens as $token) {
             if ($token->type == 'Text') {
+                if ($skipLink) {
+                    $this->buffer[] = $token;
+                    continue;
+                }
                 $word = $this->normalizeWord($token->text);
 
                 $this->fillCandidates($word);
@@ -167,6 +172,14 @@ class Crosslinks
                 $this->checkFullPhrase($word);
             } else {
                 $this->buffer[] = $token;
+                if ($token->type == 'Html') {
+                    if (preg_match('|<a\W|i', $token->text)) {
+                        $this->candidates = [];
+                        $skipLink = true;
+                    } elseif (preg_match('|</a|', $token->text)) {
+                        $skipLink = false;
+                    }
+                }
             }
         }
 
