@@ -190,6 +190,10 @@ class Crosslinks
 
     public static function parse($text, $phrases, $stemmers = [])
     {
+        if (! count($phrases)) {
+            return $text;
+        }
+
         $crosslinks = new self();
 
         $crosslinks->addStemmers($stemmers);
