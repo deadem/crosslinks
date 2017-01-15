@@ -100,9 +100,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         ];
         $text = '';
 
-        for ($i = 0; $i < 10000; ++$i) {
-            $dictionary[chr(rand() % 42 + ord('a')).' '.chr(rand() % 22 + ord('a'))] = 'link';
-            $text .= chr($i % 22 + ord('a')).'x ';
+        for ($i = 0; $i < 5000; ++$i) {
+            $dictionary[chr(rand() % 42 + 32).' '.chr(rand() % 42 + 32)] = 'link';
+            $text .= chr($i % 42 + 32).' xx ';
         }
 
         $crosslinks = Crosslinks::parse('a bz cz d'.$text, $dictionary);
