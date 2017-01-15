@@ -6,6 +6,7 @@ class Crosslinks
 {
     private $tokens = [];
     private $phrases = [];
+    private $words = [];
     private $stemmers = [];
 
     private $candidates = [];
@@ -40,6 +41,16 @@ class Crosslinks
                 'link' => $link,
             ];
         }
+
+        $this->words = [];
+        foreach ($this->phrases as $phrase) {
+            foreach ($phrase['phrase'] as $word) {
+                if (! isset($this->words[$word])) {
+                    $this->words[$word] = [];
+                }
+                $this->words[$word][] = &$phrase;
+            }
+        }
     }
 
     private function normalizeWord($word)
@@ -61,11 +72,10 @@ class Crosslinks
         });
 
         // insert new candidates
-        foreach ($this->phrases as $entry) {
-            if (array_search($word, $entry['phrase']) !== false) {
-                $entry['position'] = count($this->buffer);
-                $this->candidates[] = $entry;
-            }
+        foreach (isset($this->words[$word]) ? $this->words[$word] : [] as $phrases) {
+            $entry = $phrases;
+            $entry['position'] = count($this->buffer);
+            $this->candidates[] = $entry;
         }
     }
 
