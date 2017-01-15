@@ -29,6 +29,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $crosslinks = Crosslinks::parse('a b c d', ['b c' => '/a-link']);
         $this->assertEquals('a <a href="/a-link">b c</a> d', $crosslinks);
 
+        $crosslinks = Crosslinks::parse('a b c d', ['a a' >= 'none', 'b c' => '/a-link']);
+        $this->assertEquals('a <a href="/a-link">b c</a> d', $crosslinks);
+
         $crosslinks = Crosslinks::parse('a b c d', ['c b' => '/a-link']);
         $this->assertEquals('a <a href="/a-link">b c</a> d', $crosslinks);
 
@@ -88,5 +91,21 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ]);
             $this->assertEquals('a <b><a href="/a-link">testing functions</a></b> d', $crosslinks);
         }
+    }
+
+    public function testLargeDictionary()
+    {
+        $dictionary = [
+            'b c' => '/a-link',
+        ];
+        $text = '';
+
+        for ($i = 0; $i < 10000; ++$i) {
+            $dictionary[chr($i % 22 + ord('a')).' '.chr($i % 22 + ord('a'))] = 'link';
+            $text .= chr($i % 22 + ord('a')).'x ';
+        }
+
+        $crosslinks = Crosslinks::parse('a b c d'.$text, $dictionary);
+        $this->assertEquals('a <a href="/a-link">b c</a> d'.$text, $crosslinks);
     }
 }
