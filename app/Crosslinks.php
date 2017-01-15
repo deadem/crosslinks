@@ -44,6 +44,8 @@ class Crosslinks
 
     private function normalizeWord($word)
     {
+        $word = mb_strtolower($word);
+
         foreach ($this->stemmers as $func) {
             $word = $func($word);
         }
