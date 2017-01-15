@@ -6,7 +6,6 @@ class Crosslinks
 {
     private $tokens = [];
     private $phrases = [];
-    private $words = [];
     private $stemmers = [];
 
     private $candidates = [];
@@ -33,8 +32,9 @@ class Crosslinks
             return;
         }
 
+        $entries = [];
         foreach ($phrases as $phrase => $link) {
-            $this->phrases[] = [
+            $entries[] = [
                 'phrase' => array_map(function ($word) {
                     return $this->normalizeWord($word);
                 }, preg_split('/\s+/', $phrase)),
@@ -42,13 +42,16 @@ class Crosslinks
             ];
         }
 
-        $this->words = [];
-        foreach ($this->phrases as $phrase) {
+        foreach ($entries as $phrase) {
             foreach ($phrase['phrase'] as $word) {
-                if (! isset($this->words[$word])) {
-                    $this->words[$word] = [];
+                if (empty($word)) {
+                    continue;
                 }
-                $this->words[$word][] = &$phrase;
+
+                if (! isset($this->phrases[$word])) {
+                    $this->phrases[$word] = [];
+                }
+                $this->phrases[$word][] = $phrase;
             }
         }
     }
@@ -72,7 +75,7 @@ class Crosslinks
         });
 
         // insert new candidates
-        foreach (isset($this->words[$word]) ? $this->words[$word] : [] as $phrases) {
+        foreach (isset($this->phrases[$word]) ? $this->phrases[$word] : [] as $phrases) {
             $entry = $phrases;
             $entry['position'] = count($this->buffer);
             $this->candidates[] = $entry;
@@ -99,8 +102,15 @@ class Crosslinks
     {
         foreach ($this->candidates as &$entry) {
             // remove matched word
-            $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word) {
-                return $word != $phrase;
+            $matched = false;
+            $entry['phrase'] = array_filter($entry['phrase'], function ($phrase) use ($word, &$matched) {
+                if ($matched == false && $word == $phrase) {
+                    $matched = true;
+
+                    return false;
+                }
+
+                return true;
             });
 
             // full phrase match
