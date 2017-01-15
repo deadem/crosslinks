@@ -96,16 +96,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testLargeDictionary()
     {
         $dictionary = [
-            'b c' => '/a-link',
+            'bz cz' => '/a-link',
         ];
         $text = '';
 
         for ($i = 0; $i < 10000; ++$i) {
-            $dictionary[chr($i % 22 + ord('a')).' '.chr($i % 22 + ord('a'))] = 'link';
+            $dictionary[chr(rand() % 42 + ord('a')).' '.chr(rand() % 22 + ord('a'))] = 'link';
             $text .= chr($i % 22 + ord('a')).'x ';
         }
 
-        $crosslinks = Crosslinks::parse('a b c d'.$text, $dictionary);
-        $this->assertEquals('a <a href="/a-link">b c</a> d'.$text, $crosslinks);
+        $crosslinks = Crosslinks::parse('a bz cz d'.$text, $dictionary);
+        $this->assertEquals('a <a href="/a-link">bz cz</a> d'.$text, $crosslinks);
     }
 }
