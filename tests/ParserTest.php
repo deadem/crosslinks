@@ -42,6 +42,12 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a <a href="/a-link">b c d</a>', $crosslinks);
     }
 
+    public function testPunctUnicode()
+    {
+        $crosslinks = Crosslinks::parse('й “ц “у к', ['ц у' => '/a-link']);
+        $this->assertEquals('й <a href="/a-link">“ц “у</a> к', $crosslinks);
+    }
+
     public function testHtml()
     {
         $crosslinks = Crosslinks::parse('a <b>b c</b> d', ['b c' => '/a-link']);
